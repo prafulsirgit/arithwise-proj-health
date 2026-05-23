@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oncology Knowledge Repository</title>
+  <meta name="description"
+    content="Integrated platform combining PubMed oncology publications with NCBO BioPortal ontology concepts for semantic knowledge discovery." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">⚕</div>
+      <div class="logo-text">
+        <span class="logo-title">OncoDB</span>
+        <span class="logo-sub">Knowledge Repository</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" data-page="discover" id="nav-discover" href="#discover">
+        <span class="nav-icon">🔍</span><span>Discover</span>
+      </a>
+      <a class="nav-item active" data-page="dashboard" id="nav-dashboard" href="#dashboard">
+        <span class="nav-icon">⊞</span><span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-page="publications" id="nav-publications" href="#publications">
+        <span class="nav-icon">📄</span><span>Publications</span>
+      </a>
+      <a class="nav-item" data-page="ontology" id="nav-ontology" href="#ontology">
+        <span class="nav-icon">🧬</span><span>Ontology Browser</span>
+      </a>
+      <a class="nav-item" data-page="relationships" id="nav-relationships" href="#relationships">
+        <span class="nav-icon">🔗</span><span>Relationships</span>
+      </a>
+      <a class="nav-item" data-page="graph" id="nav-graph" href="#graph">
+        <span class="nav-icon">🌐</span><span>Knowledge Graph</span>
+      </a>
+      <a class="nav-item" data-page="ingest" id="nav-ingest" href="#ingest">
+        <span class="nav-icon">📥</span><span>Data Management</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="api-status" id="api-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Connecting…</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <main class="main-content" id="main-content">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="global-search-wrap">
+          <input type="text" id="global-search" placeholder="Search articles, concepts…" class="global-search" />
+          <span class="search-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+          <span class="sun-icon" style="display:flex;align-items:center;justify-content:center;">
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="28" height="28" viewBox="0,0,256,256">
+              <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
+                stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
+                font-family="none" font-weight="none" font-size="none" text-anchor="none"
+                style="mix-blend-mode: normal">
+                <g transform="scale(5.12,5.12)">
+                  <path
+                    d="M24.90625,3.96875c-0.04297,0.00781 -0.08594,0.01953 -0.125,0.03125c-0.46484,0.10547 -0.79297,0.52344 -0.78125,1v6c-0.00391,0.35938 0.18359,0.69531 0.49609,0.87891c0.3125,0.17969 0.69531,0.17969 1.00781,0c0.3125,-0.18359 0.5,-0.51953 0.49609,-0.87891v-6c0.01172,-0.28906 -0.10547,-0.56641 -0.3125,-0.76172c-0.21094,-0.19922 -0.49609,-0.29687 -0.78125,-0.26953zM10.65625,9.84375c-0.375,0.06641 -0.67578,0.33984 -0.78125,0.70313c-0.10547,0.36719 0.00391,0.75781 0.28125,1.01563l4.25,4.25c0.24219,0.29688 0.62891,0.43359 1.00391,0.34766c0.37109,-0.08594 0.66406,-0.37891 0.75,-0.75c0.08594,-0.375 -0.05078,-0.76172 -0.34766,-1.00391l-4.25,-4.25c-0.20703,-0.22266 -0.50781,-0.33594 -0.8125,-0.3125c-0.03125,0 -0.0625,0 -0.09375,0zM39.03125,9.84375c-0.22656,0.03125 -0.4375,0.14453 -0.59375,0.3125l-4.25,4.25c-0.29687,0.24219 -0.43359,0.62891 -0.34766,1.00391c0.08594,0.37109 0.37891,0.66406 0.75,0.75c0.375,0.08594 0.76172,-0.05078 1.00391,-0.34766l4.25,-4.25c0.3125,-0.29687 0.40234,-0.76172 0.21875,-1.15234c-0.1875,-0.39453 -0.60156,-0.62109 -1.03125,-0.56641zM24.90625,15c-0.03125,0.00781 -0.0625,0.01953 -0.09375,0.03125c-0.0625,0.00391 -0.125,0.01563 -0.1875,0.03125c-0.01172,0.01172 -0.01953,0.01953 -0.03125,0.03125c-5.30469,0.22656 -9.59375,4.54688 -9.59375,9.90625c0,5.50391 4.49609,10 10,10c5.50391,0 10,-4.49609 10,-10c0,-5.33984 -4.25391,-9.64453 -9.53125,-9.90625c-0.03516,0 -0.05859,-0.03125 -0.09375,-0.03125c-0.10156,-0.03906 -0.20703,-0.05859 -0.3125,-0.0625c-0.01953,0 -0.04297,0 -0.0625,0c-0.03125,0 -0.0625,0 -0.09375,0zM24.9375,17c0.01953,0 0.04297,0 0.0625,0c0.03125,0 0.0625,0 0.09375,0c4.375,0.05078 7.90625,3.61328 7.90625,8c0,4.42188 -3.57812,8 -8,8c-4.41797,0 -8,-3.57812 -8,-8c0,-4.39844 3.54688,-7.96484 7.9375,-8zM4.71875,24c-0.55078,0.07813 -0.9375,0.58984 -0.85937,1.14063c0.07813,0.55078 0.58984,0.9375 1.14063,0.85938h6c0.35938,0.00391 0.69531,-0.18359 0.87891,-0.49609c0.17969,-0.3125 0.17969,-0.69531 0,-1.00781c-0.18359,-0.3125 -0.51953,-0.5 -0.87891,-0.49609h-6c-0.03125,0 -0.0625,0 -0.09375,0c-0.03125,0 -0.0625,0 -0.09375,0c-0.03125,0 -0.0625,0 -0.09375,0zM38.71875,24c-0.55078,0.07813 -0.9375,0.58984 -0.85937,1.14063c0.07813,0.55078 0.58984,0.9375 1.14063,0.85938h6c0.35938,0.00391 0.69531,-0.18359 0.87891,-0.49609c0.17969,-0.3125 0.17969,-0.69531 0,-1.00781c-0.18359,-0.3125 -0.51953,-0.5 -0.87891,-0.49609h-6c-0.03125,0 -0.0625,0 -0.09375,0c-0.03125,0 -0.0625,0 -0.09375,0c-0.03125,0 -0.0625,0 -0.09375,0zM15,33.875c-0.22656,0.03125 -0.4375,0.14453 -0.59375,0.3125l-4.25,4.25c-0.29687,0.24219 -0.43359,0.62891 -0.34766,1.00391c0.08594,0.37109 0.37891,0.66406 0.75,0.75c0.375,0.08594 0.76172,-0.05078 1.00391,-0.34766l4.25,-4.25c0.29688,-0.28516 0.38672,-0.72656 0.22656,-1.10547c-0.15625,-0.37891 -0.53516,-0.62109 -0.94531,-0.61328c-0.03125,0 -0.0625,0 -0.09375,0zM34.6875,33.875c-0.375,0.06641 -0.67578,0.33984 -0.78125,0.70313c-0.10547,0.36719 0.00391,0.75781 0.28125,1.01563l4.25,4.25c0.24219,0.29688 0.62891,0.43359 1.00391,0.34766c0.37109,-0.08594 0.66406,-0.37891 0.75,-0.75c0.08594,-0.375 -0.05078,-0.76172 -0.34766,-1.00391l-4.25,-4.25c-0.1875,-0.19922 -0.44531,-0.30859 -0.71875,-0.3125c-0.03125,0 -0.0625,0 -0.09375,0c-0.03125,0 -0.0625,0 -0.09375,0zM24.90625,37.96875c-0.04297,0.00781 -0.08594,0.01953 -0.125,0.03125c-0.46484,0.10547 -0.79297,0.52344 -0.78125,1v6c-0.00391,0.35938 0.18359,0.69531 0.49609,0.87891c0.3125,0.17969 0.69531,0.17969 1.00781,0c0.3125,-0.18359 0.5,-0.51953 0.49609,-0.87891v-6c0.01172,-0.28906 -0.10547,-0.56641 -0.3125,-0.76172c-0.21094,-0.19922 -0.49609,-0.29687 -0.78125,-0.26953z">
+                  </path>
+                </g>
+              </g>
+            </svg>
+          </span>
+          <span class="moon-icon"><img src="https://static.thenounproject.com/png/dark-mode-icon-7296119-512.png"
+              alt="dark-mode-moon" style="width: 24px;height: 24px;"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── PAGE: DISCOVER ── -->
+    <section class="page" id="page-discover">
+      <!-- Hero Search -->
+      <div class="discover-hero">
+        <div class="discover-hero-badge">✦ AI-Powered Oncology Search</div>
+        <h2 class="discover-hero-title">Discover Oncology Knowledge</h2>
+        <p class="discover-hero-sub">Search publications, diseases, biomarkers, genes, drugs, and ontology concepts from a single interface</p>
+        <div class="discover-search-wrap">
+          <span class="discover-search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input type="text" id="discover-search-input" class="discover-search-input"
+                 placeholder="Search oncology topics…" autocomplete="off" />
+          <button class="btn btn-discover" id="discover-search-btn">Search</button>
+          <div class="discover-suggestions" id="discover-suggestions"></div>
+        </div>
+        <div class="discover-quick-hints">
+          <span class="discover-hint" onclick="runDiscoverSearch('BRCA1')">BRCA1</span>
+          <span class="discover-hint" onclick="runDiscoverSearch('lung cancer')">Lung Cancer</span>
+          <span class="discover-hint" onclick="runDiscoverSearch('immunotherapy')">Immunotherapy</span>
+          <span class="discover-hint" onclick="runDiscoverSearch('EGFR inhibitor')">EGFR Inhibitor</span>
+          <span class="discover-hint" onclick="runDiscoverSearch('HER2')">HER2</span>
+          <span class="discover-hint" onclick="runDiscoverSearch('checkpoint inhibitor')">Checkpoint Inhibitor</span>
+        </div>
+      </div>
+
+      <!-- Results Tabs -->
+      <div class="discover-tabs" id="discover-tabs" style="display:none">
+        <button class="discover-tab active" id="dtab-all" onclick="switchDiscoverTab('all')">
+          All <span class="dtab-count" id="dtab-all-count">0</span>
+        </button>
+        <button class="discover-tab" id="dtab-publications" onclick="switchDiscoverTab('publications')">
+          📄 Papers <span class="dtab-count" id="dtab-publications-count">0</span>
+        </button>
+        <button class="discover-tab" id="dtab-diseases" onclick="switchDiscoverTab('diseases')">
+          ✚ Diseases <span class="dtab-count" id="dtab-diseases-count">0</span>
+        </button>
+        <button class="discover-tab" id="dtab-drugs" onclick="switchDiscoverTab('drugs')">
+          ⬘ Drugs <span class="dtab-count" id="dtab-drugs-count">0</span>
+        </button>
+        <button class="discover-tab" id="dtab-biomarkers" onclick="switchDiscoverTab('biomarkers')">
+          ⬙ Biomarkers <span class="dtab-count" id="dtab-biomarkers-count">0</span>
+        </button>
+        <button class="discover-tab" id="dtab-concepts" onclick="switchDiscoverTab('concepts')">
+          ⬡ Concepts <span class="dtab-count" id="dtab-concepts-count">0</span>
+        </button>
+      </div>
+
+      <!-- Results Body -->
+      <div class="discover-results-section" id="discover-results-section" style="display:none">
+        <div id="discover-results-body"></div>
+      </div>
+
+      <!-- Trending + Featured row (shown when no search) -->
+      <div class="discover-panels">
+        <!-- Trending Topics -->
+        <div class="discover-panel">
+          <div class="discover-panel-header">
+            <h3 class="discover-panel-title">🔥 Trending Topics</h3>
+            <button class="btn btn-ghost small" onclick="loadTrendingTopics()">↺</button>
+          </div>
+          <div class="trending-chips" id="trending-chips">
+            <span class="trending-loading">Loading…</span>
+          </div>
+        </div>
+
+        <!-- Featured Publications -->
+        <div class="discover-panel">
+          <div class="discover-panel-header">
+            <h3 class="discover-panel-title">⭐ Most Connected Papers</h3>
+          </div>
+          <div id="featured-pubs-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: DASHBOARD ── -->
+    <section class="page active" id="page-dashboard">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card" data-type="articles">
+          <div class="stat-icon">◉</div>
+          <div class="stat-value" id="stat-articles">–</div>
+          <div class="stat-label">Publications</div>
+        </div>
+        <div class="stat-card" data-type="concepts">
+          <div class="stat-icon">⬡</div>
+          <div class="stat-value" id="stat-concepts">–</div>
+          <div class="stat-label">Ontology Concepts</div>
+        </div>
+        <div class="stat-card" data-type="mappings">
+          <div class="stat-icon">◎</div>
+          <div class="stat-value" id="stat-mappings">–</div>
+          <div class="stat-label">Semantic Mappings</div>
+        </div>
+        <div class="stat-card" data-type="ontologies">
+          <div class="stat-icon">◈</div>
+          <div class="stat-value" id="stat-ontologies">–</div>
+          <div class="stat-label">Ontologies</div>
+        </div>
+        <div class="stat-card" data-type="diseases">
+          <div class="stat-icon">✚</div>
+          <div class="stat-value" id="stat-diseases">–</div>
+          <div class="stat-label">Disease Concepts</div>
+        </div>
+        <div class="stat-card" data-type="drugs">
+          <div class="stat-icon">⬘</div>
+          <div class="stat-value" id="stat-drugs">–</div>
+          <div class="stat-label">Drug Concepts</div>
+        </div>
+        <div class="stat-card" data-type="biomarkers">
+          <div class="stat-icon">⬙</div>
+          <div class="stat-value" id="stat-biomarkers">–</div>
+          <div class="stat-label">Biomarkers</div>
+        </div>
+        <div class="stat-card" data-type="authors">
+          <div class="stat-icon">✎</div>
+          <div class="stat-value" id="stat-authors">–</div>
+          <div class="stat-label">Authors</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3 class="chart-title">Publications by Year</h3>
+          <div class="chart-wrap"><canvas id="chart-years"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">Concept Categories</h3>
+          <div class="chart-wrap"><canvas id="chart-categories"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <h3 class="chart-title">Top Linked Concepts</h3>
+          <div class="chart-wrap tall"><canvas id="chart-top-concepts"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">Top Journals</h3>
+          <div id="top-journals-list" class="ranked-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: PUBLICATIONS ── -->
+    <section class="page" id="page-publications">
+      <div class="search-toolbar">
+        <input type="text" id="pub-search-q" placeholder="Search title, abstract, keywords…" class="search-input" />
+        <input type="text" id="pub-search-author" placeholder="Author name" class="search-input short" />
+        <input type="number" id="pub-search-year" placeholder="Year" class="search-input xshort" min="1990"
+          max="2030" />
+        <input type="text" id="pub-search-pmid" placeholder="PMID" class="search-input xshort" />
+        <button class="btn btn-primary" id="pub-search-btn">Search</button>
+        <button class="btn btn-ghost" id="pub-clear-btn">Clear</button>
+      </div>
+      <div class="list-meta" id="pub-list-meta"></div>
+
+      <div class="pub-layout">
+        <div class="pub-list-pane" id="pub-list-pane">
+          <div id="pub-list" class="pub-list"></div>
+          <div class="pagination" id="pub-pagination"></div>
+        </div>
+        <div class="pub-detail-pane" id="pub-detail-pane">
+          <div class="detail-placeholder">
+            <div class="placeholder-icon">◉</div>
+            <p>Select an article to view details</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: ONTOLOGY BROWSER ── -->
+    <section class="page" id="page-ontology">
+      <div class="search-toolbar">
+        <input type="text" id="ont-search-q" placeholder="Search concepts, synonyms, definitions…"
+          class="search-input" />
+        <select id="ont-filter-ontology" class="search-select">
+          <option value="">All Ontologies</option>
+        </select>
+        <select id="ont-filter-category" class="search-select">
+          <option value="">All Categories</option>
+          <option value="disease">Disease</option>
+          <option value="drug">Drug</option>
+          <option value="biomarker">Biomarker</option>
+          <option value="general">General</option>
+        </select>
+        <button class="btn btn-primary" id="ont-search-btn">Search</button>
+      </div>
+      <div class="list-meta" id="ont-list-meta"></div>
+
+      <div class="ont-layout">
+        <div class="ont-list-pane" id="ont-list-pane">
+          <div id="ont-list" class="ont-list"></div>
+          <div class="pagination" id="ont-pagination"></div>
+        </div>
+        <div class="ont-detail-pane" id="ont-detail-pane">
+          <div class="detail-placeholder">
+            <div class="placeholder-icon">⬡</div>
+            <p>Select a concept to explore</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: RELATIONSHIPS ── -->
+    <section class="page" id="page-relationships">
+      <div class="search-toolbar">
+        <select id="rel-filter-category" class="search-select">
+          <option value="">All Types</option>
+          <option value="disease">Disease</option>
+          <option value="drug">Drug</option>
+          <option value="biomarker">Biomarker</option>
+          <option value="general">General</option>
+        </select>
+        <select id="rel-filter-match" class="search-select">
+          <option value="">All Match Types</option>
+          <option value="mesh">MeSH</option>
+          <option value="keyword">Keyword</option>
+          <option value="annotator">Annotator</option>
+        </select>
+        <button class="btn btn-primary" id="rel-search-btn">Filter</button>
+      </div>
+
+      <div class="summary-bar" id="rel-summary"></div>
+      <div class="rel-table-wrap">
+        <table class="data-table" id="rel-table">
+          <thead>
+            <tr>
+              <th>Article</th>
+              <th>Year</th>
+              <th>Concept</th>
+              <th>Category</th>
+              <th>Match Type</th>
+              <th>Matched Text</th>
+            </tr>
+          </thead>
+          <tbody id="rel-table-body"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="rel-pagination"></div>
+    </section>
+
+    <!-- ── PAGE: KNOWLEDGE GRAPH ── -->
+    <section class="page" id="page-graph">
+      <div class="graph-controls">
+        <!-- Article autocomplete -->
+        <div class="graph-search-group">
+          <div class="graph-autocomplete-wrap" id="graph-article-wrap">
+            <span class="graph-search-icon">◉</span>
+            <input type="text" id="graph-article-search" placeholder="Search article by title or keyword…"
+              class="graph-ac-input" autocomplete="off" />
+            <ul class="graph-ac-list" id="graph-article-list" role="listbox" aria-label="Article suggestions"></ul>
+          </div>
+          <button class="btn btn-primary" id="graph-load-article">Load Article Graph</button>
+        </div>
+        <!-- Concept autocomplete -->
+        <div class="graph-search-group">
+          <div class="graph-autocomplete-wrap" id="graph-concept-wrap">
+            <span class="graph-search-icon">⬡</span>
+            <input type="text" id="graph-concept-search" placeholder="Search concept by name…" class="graph-ac-input"
+              autocomplete="off" />
+            <ul class="graph-ac-list" id="graph-concept-list" role="listbox" aria-label="Concept suggestions"></ul>
+          </div>
+          <button class="btn btn-secondary" id="graph-load-concept">Load Concept Graph</button>
+        </div>
+        <!-- Actions -->
+        <div class="graph-search-group">
+          <button class="btn btn-ghost" id="graph-freeze-btn">⏸ Freeze</button>
+          <button class="btn btn-ghost" id="graph-reset-btn" style="background: rgba(236, 72, 153, 0.08); border-color: rgba(236, 72, 153, 0.2); color: var(--accent-pink);">🗑 Clear</button>
+        </div>
+        <!-- Legend -->
+        <div class="graph-legend">
+          <span class="legend-item article">● Article</span>
+          <span class="legend-item disease">● Disease</span>
+          <span class="legend-item drug">● Drug</span>
+          <span class="legend-item biomarker">● Biomarker</span>
+          <span class="legend-item general">● General</span>
+        </div>
+      </div>
+      
+      <div class="graph-layout">
+        <div class="graph-canvas-pane">
+          <div class="graph-container" id="graph-container">
+            <div class="graph-placeholder" id="graph-placeholder">
+              <div class="placeholder-icon">✦</div>
+              <p>Search for an article or concept above to visualise the knowledge graph</p>
+            </div>
+            <svg id="knowledge-graph"></svg>
+          </div>
+          <div class="graph-info" id="graph-info"></div>
+        </div>
+        <div class="graph-detail-pane">
+          <h3 class="chart-title" style="margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">Node Explorer</h3>
+          <div id="graph-details-card" class="graph-details-card">
+            <div class="details-empty-state">
+              <div class="empty-icon">ℹ</div>
+              <p>Select any node in the graph to display its metadata, abstract, or ontology definitions here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PAGE: DATA MANAGEMENT ── -->
+    <section class="page" id="page-ingest">
+      <div class="ingest-grid">
+        <!-- PubMed Panel -->
+        <div class="ingest-card">
+          <div class="ingest-card-header">
+            <span class="ingest-icon pubmed">◉</span>
+            <h3>PubMed Ingestion</h3>
+          </div>
+          <p class="ingest-desc">Fetch oncology articles from NCBI PubMed using the Entrez API.</p>
+          <div class="form-group">
+            <label>Search Query</label>
+            <textarea id="ingest-pubmed-query" rows="3"
+              class="form-textarea">cancer[Title/Abstract] OR oncology[Title/Abstract] OR neoplasm[MeSH Terms]</textarea>
+          </div>
+          <div class="form-group">
+            <label>Max Articles</label>
+            <input type="number" id="ingest-pubmed-max" value="200" min="1" max="2000" class="form-input" />
+          </div>
+          <button class="btn btn-primary full-width" id="ingest-pubmed-btn">▶ Start PubMed Ingestion</button>
+        </div>
+
+        <!-- BioPortal Panel -->
+        <div class="ingest-card">
+          <div class="ingest-card-header">
+            <span class="ingest-icon bioportal">⬡</span>
+            <h3>BioPortal Ingestion</h3>
+          </div>
+          <p class="ingest-desc">Fetch ontology concepts from NCBO BioPortal. Requires a configured API key.</p>
+          <div class="form-group">
+            <label>Ontologies (comma-separated)</label>
+            <input type="text" id="ingest-bp-onts" value="NCIT,DOID,CHEBI,GO" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>Max Concepts per Ontology</label>
+            <input type="number" id="ingest-bp-max" value="500" min="10" max="5000" class="form-input" />
+          </div>
+          <button class="btn btn-secondary full-width" id="ingest-bp-btn">▶ Start BioPortal Ingestion</button>
+        </div>
+
+        <!-- Mapping Panel -->
+        <div class="ingest-card">
+          <div class="ingest-card-header">
+            <span class="ingest-icon mapper">◎</span>
+            <h3>Concept Mapping</h3>
+          </div>
+          <p class="ingest-desc">Link unmapped articles to BioPortal concepts via MeSH terms, keywords, and the
+            Annotator API.</p>
+          <div class="form-group">
+            <label>Articles to Map</label>
+            <input type="number" id="ingest-map-limit" value="100" min="1" max="1000" class="form-input" />
+          </div>
+          <button class="btn btn-accent full-width" id="ingest-map-btn">▶ Start Mapping</button>
+        </div>
+      </div>
+
+      <!-- Job History -->
+      <div class="jobs-section">
+        <div class="jobs-header">
+          <h3>Ingestion Job History</h3>
+          <button class="btn btn-ghost small" id="refresh-jobs-btn">↺ Refresh</button>
+        </div>
+        <div class="jobs-table-wrap">
+          <table class="data-table" id="jobs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Query</th>
+                <th>New</th>
+                <th>Processed</th>
+                <th>Started</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <div class="danger-zone-header">
+          <span class="danger-icon">⚠</span>
+          <div>
+            <h3>Danger Zone</h3>
+            <p>These actions are irreversible. All data will be permanently deleted.</p>
+          </div>
+        </div>
+        <button class="btn btn-danger" id="reset-db-btn">🗑 Reset Entire Database</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════ TOAST ══════════════ -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/analytics.js"></script>
+  <script src="/static/js/search.js"></script>
+  <script src="/static/js/ontology.js"></script>
+  <script src="/static/js/relationships.js"></script>
+  <script src="/static/js/visualizations.js"></script>
+  <script src="/static/js/ingest.js"></script>
+  <script src="/static/js/discover.js"></script>
+  <script src="/static/js/ai.js"></script>
+</body>
+
+</html>
