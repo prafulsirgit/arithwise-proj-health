@@ -13,3 +13,4 @@ __pycache__/
 # Ignore custom folders
 personal-use/
 agent-use/
+huggingface-space/
